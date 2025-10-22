@@ -1,4 +1,5 @@
 
+import 'package:chat_app/core/routing/routing_generator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -13,7 +14,7 @@ class ChatApp extends StatelessWidget {
       builder: (context, child) {
         return MaterialApp.router(
           debugShowCheckedModeBanner: false,
-          routerConfig: ,
+          routerConfig: RoutingGenerator.goRouter,
         );
       },
     );
