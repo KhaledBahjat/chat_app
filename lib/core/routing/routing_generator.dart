@@ -1,4 +1,5 @@
 import 'package:chat_app/core/routing/app_routs.dart';
+import 'package:chat_app/views/auth/register_view.dart';
 import 'package:chat_app/views/auth/sign_in_view.dart';
 import 'package:go_router/go_router.dart';
 
@@ -10,6 +11,11 @@ class RoutingGenerator {
         path: AppRouts.signInView,
         name: AppRouts.signInView,
         builder: (context, state) => SignInView(),
+      ),
+      GoRoute(
+        path: AppRouts.registerView,
+        name: AppRouts.registerView,
+        builder: (context, state) => RegisterView(),
       ),
     ],
   );

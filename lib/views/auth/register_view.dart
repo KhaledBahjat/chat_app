@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
-class SignInView extends StatelessWidget {
-  const SignInView({super.key});
+class RegisterView extends StatelessWidget {
+  const RegisterView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +43,7 @@ class SignInView extends StatelessWidget {
                   height: 80.h,
                 ),
                 Text(
-                  'Sign In',
+                  'Sign Up',
                   style: TextStyle(fontSize: 40, color: AppColor.whiteColor),
                 ),
                 SizedBox(height: 15.h),
@@ -63,7 +63,7 @@ class SignInView extends StatelessWidget {
                 SizedBox(
                   height: 15.h,
                 ),
-                CustomButton(label: 'Sign In',),
+                CustomButton(label: 'Sign Up',),
                 SizedBox(
                   height: 20.h,
                 ),
@@ -72,18 +72,16 @@ class SignInView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Don’t have an account?',
+                        'Alredy have an account?',
                         style: TextStyle(color: AppColor.whiteColor),
                       ),
                       SizedBox(
                         width: 5.sp,
                       ),
-                      GestureDetector(
-                        onTap: () => GoRouter.of(
-                          context,
-                        ).pushNamed(AppRouts.registerView),
+                      InkWell(
+                        onTap: () =>GoRouter.of(context).pushNamed(AppRouts.signInView),
                         child: Text(
-                          'Register Now',
+                          'Sign In Now',
                           style: TextStyle(color: AppColor.whiteColor),
                         ),
                       ),

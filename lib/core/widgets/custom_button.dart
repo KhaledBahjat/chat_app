@@ -3,16 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomButton extends StatelessWidget {
-  const CustomButton({
-    super.key,
+   CustomButton({
+    super.key, required this.label,
   });
-
+  void Function()? onTap;
+  final String label;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        
-      },
+      onTap: onTap,
       child: Container(
         alignment: Alignment.center,
         width: double.infinity,
@@ -22,7 +21,7 @@ class CustomButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(20.r),
         ),
         child: Text(
-          'Sign In',
+          label,
           style: TextStyle(
             fontSize: 25.sp,
             color: AppColor.primaryColor,
