@@ -1,14 +1,18 @@
+import 'dart:developer';
+
 import 'package:chat_app/core/routing/app_routs.dart';
 import 'package:chat_app/core/style/app_color.dart';
 import 'package:chat_app/core/widgets/custom_button.dart';
 import 'package:chat_app/core/widgets/custom_text_feild.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 class RegisterView extends StatelessWidget {
-  const RegisterView({super.key});
-
+  RegisterView({super.key});
+  String? email;
+  String? password;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -47,12 +51,16 @@ class RegisterView extends StatelessWidget {
                   style: TextStyle(fontSize: 40, color: AppColor.whiteColor),
                 ),
                 SizedBox(height: 15.h),
-                CustomTextField(hint: 'Email'),
+                CustomTextField(
+                  hint: 'Email',
+                  onSaved: (data) => email = data,
+                ),
 
                 SizedBox(
                   height: 10.h,
                 ),
                 CustomTextField(
+                  onSaved: (value) => password = value,
                   hint: 'Password',
                   suffixIcon: Icon(
                     Icons.remove_red_eye,
@@ -63,7 +71,27 @@ class RegisterView extends StatelessWidget {
                 SizedBox(
                   height: 15.h,
                 ),
-                CustomButton(label: 'Sign Up',),
+                CustomButton(
+                  onTap: () async {
+                    try {
+                      await registerNewUser();
+                      if (context.mounted) {
+                        showMesseage(context,'Email created successfully!');
+                      }
+                    } on FirebaseAuthException catch (e) {
+                      if (e.code == 'weak-password') {
+                        showMesseage(context, 'The password provided is too weak.');
+                      } else if (e.code == 'email-already-in-use') {
+                        if (context.mounted) {
+                       showMesseage(context, 'email-already-in-use');
+                      }
+                    }
+                    } catch (e) {
+                      showMesseage(context, 'Oops ther was an error');
+                    }
+                  },
+                  label: 'Sign Up',
+                ),
                 SizedBox(
                   height: 20.h,
                 ),
@@ -79,7 +107,8 @@ class RegisterView extends StatelessWidget {
                         width: 5.sp,
                       ),
                       InkWell(
-                        onTap: () =>GoRouter.of(context).pushNamed(AppRouts.signInView),
+                        onTap: () =>
+                            GoRouter.of(context).pushNamed(AppRouts.signInView),
                         child: Text(
                           'Sign In Now',
                           style: TextStyle(color: AppColor.whiteColor),
@@ -94,5 +123,23 @@ class RegisterView extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void showMesseage(BuildContext context,String measseg) {
+    if(context.mounted){
+           ScaffoldMessenger.of(context).showSnackBar(
+       SnackBar(
+        content: Text(measseg),
+      ),
+    );
+    }
+  }
+
+  Future<void> registerNewUser() async {
+      UserCredential user = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(
+          email: email!,
+          password: password!,
+        );
   }
 }

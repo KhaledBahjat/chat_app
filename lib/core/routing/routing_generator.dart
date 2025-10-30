@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 
 class RoutingGenerator {
   static GoRouter goRouter = GoRouter(
-    initialLocation: AppRouts.signInView,
+    initialLocation: AppRouts.registerView,
     routes: [
       GoRoute(
         path: AppRouts.signInView,

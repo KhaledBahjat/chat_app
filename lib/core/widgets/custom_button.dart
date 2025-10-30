@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class CustomButton extends StatelessWidget {
    CustomButton({
     super.key, required this.label,
+    this.onTap,
   });
   void Function()? onTap;
   final String label;
