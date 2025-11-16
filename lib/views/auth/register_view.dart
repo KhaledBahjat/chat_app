@@ -10,7 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class RegisterView extends StatefulWidget {
-  RegisterView({super.key});
+  const RegisterView({super.key});
 
   @override
   State<RegisterView> createState() => _RegisterViewState();
@@ -71,6 +71,7 @@ class _RegisterViewState extends State<RegisterView> {
                     ),
                     SizedBox(height: 15.h),
                     CustomTextField(
+                      keyboardType: TextInputType.emailAddress,
                       hint: 'Email',
                       onSaved: (data) => email = data,
                     ),
@@ -80,6 +81,7 @@ class _RegisterViewState extends State<RegisterView> {
                     ),
                     CustomTextField(
                       onSaved: (value) => password = value,
+                      keyboardType: TextInputType.visiblePassword,
                       hint: 'Password',
                       obscureText: isObscure,
                       suffixIcon: IconButton(
@@ -111,7 +113,10 @@ class _RegisterViewState extends State<RegisterView> {
                                 context,
                                 'Email created successfully!',
                               );
+
                             }
+                              Navigator.of(context).pop();
+                           
                           } on FirebaseAuthException catch (e) {
                             if (e.code == 'weak-password') {
                               Methods.showMesseage(
@@ -135,6 +140,7 @@ class _RegisterViewState extends State<RegisterView> {
                           setState(() {
                             isLoading = false;
                           });
+                        
                         } else {}
                       },
                       label: 'Sign Up',
