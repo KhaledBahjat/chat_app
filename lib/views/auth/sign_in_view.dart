@@ -116,7 +116,7 @@ class _SignInViewState extends State<SignInView> {
                                 );
 
                             if (!context.mounted) return;
-                            GoRouter.of(context).pushNamed(AppRouts.homeView);
+                            GoRouter.of(context).pushNamed(AppRouts.chatView);
                           } on FirebaseAuthException catch (e) {
                             if (e.code == 'invalid-email') {
                               // Methods.showMesseage(context, 'Invalid Email');

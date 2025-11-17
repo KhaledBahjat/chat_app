@@ -1,6 +1,7 @@
 import 'package:chat_app/core/routing/app_routs.dart';
 import 'package:chat_app/views/auth/register_view.dart';
 import 'package:chat_app/views/auth/sign_in_view.dart';
+import 'package:chat_app/views/chat/chat_view.dart';
 import 'package:chat_app/views/home/home_view.dart';
 import 'package:go_router/go_router.dart';
 
@@ -22,6 +23,11 @@ class RoutingGenerator {
         path: AppRouts.homeView,
         name: AppRouts.homeView,
         builder: (context, state) => HomeView(),
+      ),
+      GoRoute(
+        path: AppRouts.chatView,
+        name: AppRouts.chatView,
+        builder: (context, state) => ChatView(),
       ),
     ],
   );
