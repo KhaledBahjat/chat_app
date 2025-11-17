@@ -9,21 +9,24 @@ class ChatBubbel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Align(
       alignment: Alignment.centerLeft,
-      width: 150.w,
-      height: 50.h,
-      margin: EdgeInsets.all(16.w),
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-      decoration: BoxDecoration(
-        color: AppColor.primaryColor,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(16.r),
-          topRight: Radius.circular(16.r),
-          bottomRight: Radius.circular(16.r),
+      child: Container(
+        // alignment: Alignment.centerLeft,
+        margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 15.h),
+        decoration: BoxDecoration(
+          color: AppColor.primaryColor,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10.r),
+            topRight: Radius.circular(20.r),
+            bottomRight: Radius.circular(20.r),
+          ),
+        ),
+        child: Text(
+          "Chat View Content ",
         ),
       ),
-      child: Text("Chat View Content"),
     );
   }
 }
