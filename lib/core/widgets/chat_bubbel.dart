@@ -1,12 +1,13 @@
 import 'package:chat_app/core/style/app_color.dart';
+import 'package:chat_app/models/message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ChatBubbel extends StatelessWidget {
   const ChatBubbel({
-    super.key,
+    super.key, required this.message,
   });
-
+final Message message;
   @override
   Widget build(BuildContext context) {
     return Align(
@@ -24,7 +25,7 @@ class ChatBubbel extends StatelessWidget {
           ),
         ),
         child: Text(
-          "Chat View Content ",
+          message.message,
         ),
       ),
     );

@@ -116,7 +116,9 @@ class _SignInViewState extends State<SignInView> {
                                 );
 
                             if (!context.mounted) return;
-                            GoRouter.of(context).pushNamed(AppRouts.chatView);
+                            GoRouter.of(
+                              context,
+                            ).pushReplacementNamed(AppRouts.chatView);
                           } on FirebaseAuthException catch (e) {
                             if (e.code == 'invalid-email') {
                               // Methods.showMesseage(context, 'Invalid Email');
@@ -124,7 +126,9 @@ class _SignInViewState extends State<SignInView> {
                             } else if (e.code == 'user-not-found') {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('User not found for this Email'),
+                                  content: Text(
+                                    'User not found for this Email',
+                                  ),
                                 ),
                               );
                             } else if (e.code == 'wrong-password') {
