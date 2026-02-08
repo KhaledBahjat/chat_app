@@ -16,6 +16,8 @@ class Chatna extends StatelessWidget {
       splitScreenMode: false,
       builder: (context, child) {
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Chatna',
           home: SignIn(),
         );
       },

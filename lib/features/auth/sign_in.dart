@@ -1,6 +1,9 @@
 import 'package:chat_app/core/theme/app_color.dart';
 import 'package:chat_app/core/widgets/spacing.dart';
+import 'package:chat_app/features/widgets/custom_button.dart';
 import 'package:chat_app/features/widgets/custom_text_feild.dart';
+import 'package:chat_app/features/widgets/logo.dart';
+import 'package:chat_app/features/widgets/show_forget_password_dialog_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -12,56 +15,206 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
-  bool obscureText = true;
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  bool isObscure = true;
+  GlobalKey<FormState> formstate = GlobalKey();
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColor.primaryColor,
-      body: Padding(
-        padding: EdgeInsets.all(32.w),
-        child: Column(
-          children: [
-            HeightSpace(50),
-            Image.asset('assets/image/logo.png', height: 150, width: 200),
-            Text(
-              'Chatna',
-              style: TextStyle(
-                fontSize: 30,
-                color: Colors.white,
-                fontFamily: 'Pacifico',
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        backgroundColor: AppColor.primaryColor,
+        body: isLoading
+            ? Center(
+                child: CircularProgressIndicator(
+                  color: Colors.orange,
+                  strokeWidth: 2,
+                ),
+              )
+            : Padding(
+                padding: EdgeInsets.all(20),
+                child: ListView(
+                  children: [
+                    Form(
+                      key: formstate,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          HeightSpace(70),
+                          Logo(),
+                          SizedBox(
+                            height: 20.h,
+                          ),
+                          Text(
+                            "Welcome Back",
+                            style: TextStyle(
+                              fontSize: 24.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontFamily: 'Pacifico',
+                            ),
+                          ),
+                          SizedBox(
+                            height: 10.h,
+                          ),
+                          Text(
+                            'Please Sign in to your account',
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              color: Colors.white70,
+                            ),
+                          ),
+                          SizedBox(
+                            height: 40.h,
+                          ),
+                          Text(
+                            'Email',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white,
+                            ),
+                          ),
+                          HeightSpace(10),
+                          // email textfield
+                          TextFieldWidget(
+                            validator: (val) {
+                              if (val!.isEmpty) {
+                                return 'Enter your email';
+                              }
+                              return null;
+                            },
+                            prefixIcon: Icon(Icons.email),
+                            hintText: 'Enter your email',
+                            controller: emailController,
+                          ),
+
+                          SizedBox(
+                            height: 20.h,
+                          ),
+
+                          Text(
+                            'Password',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          HeightSpace(10),
+                          TextFieldWidget(
+                            validator: (val) {
+                              if (val!.isEmpty) {
+                                return 'Enter your password';
+                              }
+                              return null;
+                            },
+                            obscureText: isObscure,
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  isObscure = !isObscure;
+                                });
+                              },
+                              icon: isObscure
+                                  ? Icon(Icons.visibility_off)
+                                  : Icon(Icons.visibility),
+                            ),
+                            hintText: 'Enter your password',
+                            controller: passwordController,
+                          ),
+
+                          // password textfield
+                          GestureDetector(
+                            onTap: () => showForgotPasswordDialog(context),
+                            child: Container(
+                              margin: EdgeInsets.only(top: 10.h, bottom: 20.h),
+                              alignment: Alignment.topRight,
+                              child: Text(
+                                'Forgot Password?',
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  color: Colors.orange.shade200,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // login button
+                    CustomButton(
+                      title: 'Login with Email',
+                      onPressed: () async {
+                      
+                      },
+                    ),
+                    SizedBox(
+                      height: 20.h,
+                    ),
+                    // Text('Or Continue with'),
+                    MaterialButton(
+                      height: 40.h,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50.r),
+                      ),
+                      textColor: Colors.white,
+                      color: Colors.red.shade700,
+                      onPressed: () {
+                        
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Continue with Google'),
+                          SizedBox(width: 10.w),
+                          Image.asset('assets/icons/google.png', height: 20.h),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20.h,
+                    ),
+
+                    InkWell(
+                      onTap: () {
+                      },
+                      child: Text.rich(
+                        TextSpan(
+                          text: "Don't have an account? ",
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            color: Colors.grey,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: 'Sign Up',
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                color: Colors.orange.shade200,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Text(
-              'LOG IN',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.white,
-                fontFamily: 'Pacifico',
-              ),
-            ),
-            TextFieldWidget(
-              validator: (value) {},
-              hintText: "Email",
-              suffixIcon: Icon(Icons.email, color: Colors.black),
-            ),
-            HeightSpace(20),
-            TextFieldWidget(
-              validator: (value) {},
-              hintText: "Password",
-              obscureText: obscureText,
-              suffixIcon: IconButton(
-                onPressed: () {
-                  setState(() {
-                    obscureText = !obscureText;
-                  });
-                },
-                icon: obscureText
-                    ? Icon(Icons.visibility_off)
-                    : Icon(Icons.visibility),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
