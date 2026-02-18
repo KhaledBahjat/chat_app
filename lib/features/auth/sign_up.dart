@@ -1,5 +1,4 @@
-import 'dart:developer';
-
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:chat_app/core/theme/app_color.dart';
 import 'package:chat_app/core/widgets/spacing.dart';
 import 'package:chat_app/features/widgets/custom_button.dart';
@@ -33,6 +32,7 @@ class _SignUpState extends State<SignUp> {
     passwordController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -181,14 +181,66 @@ class _SignUpState extends State<SignUp> {
                     CustomButton(
                       title: 'Sign Up',
                       onPressed: () async {
-                        FirebaseAuth auth = FirebaseAuth.instance;
-                        UserCredential user = await auth
-                            .createUserWithEmailAndPassword(
-                              email: emailController.text,
-                              password: passwordController.text,
-                            );
-
-                            log(user.user!.email.toString());
+                        try {
+                          await FirebaseAuth.instance
+                              .createUserWithEmailAndPassword(
+                                email: emailController.text,
+                                password: passwordController.text,
+                              );
+                          AwesomeDialog(
+                            context: context,
+                            dialogType: DialogType.success,
+                            animType: AnimType.rightSlide,
+                            title: 'Success',
+                            desc: 'Your account has been created successfully.',
+                            btnOkOnPress: () {},
+                          ).show();
+                        } on FirebaseAuthException catch (e) {
+                          if (e.code == 'weak-password') {
+                            AwesomeDialog(
+                              context: context,
+                              dialogType: DialogType.error,
+                              animType: AnimType.rightSlide,
+                              title: 'weak-password',
+                              desc: 'The password provided is too weak.',
+                              btnOkOnPress: () {},
+                            ).show();
+                            print('The password provided is too weak.');
+                          } else if (e.code == 'email-already-in-use') {
+                            AwesomeDialog(
+                              context: context,
+                              dialogType: DialogType.error,
+                              animType: AnimType.rightSlide,
+                              title: 'email-already-in-use',
+                              desc:
+                                  'The account already exists for that email.',
+                              btnOkOnPress: () {},
+                            ).show();
+                            print('The account already exists for that email.');
+                          } else if (e.code == 'invalid-email') {
+                            AwesomeDialog(
+                              context: context,
+                              dialogType: DialogType.error,
+                              animType: AnimType.rightSlide,
+                              title: 'invalid-email',
+                              desc: 'The email address is badly formatted.',
+                              btnOkOnPress: () {},
+                            ).show();
+                            print('The email address is badly formatted.');
+                          } else if (e.code == 'operation-not-allowed') {
+                            AwesomeDialog(
+                              context: context,
+                              dialogType: DialogType.error,
+                              animType: AnimType.rightSlide,
+                              title: 'operation-not-allowed',
+                              desc: 'Email/Password accounts are not enabled.',
+                              btnOkOnPress: () {},
+                            ).show();
+                            print('Email/Password accounts are not enabled.');
+                          }
+                        } catch (e) {
+                          print(e);
+                        }
                       },
                     ),
                     SizedBox(
