@@ -9,7 +9,7 @@ class TextFieldWidget extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.obscureText = false,
-    required this.validator,
+    required this.validator, this.onSubmitted,
   });
 
   final String? hintText;
@@ -18,10 +18,12 @@ class TextFieldWidget extends StatelessWidget {
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
   final bool obscureText;
+  final void Function(String)? onSubmitted;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      onFieldSubmitted: onSubmitted,
       validator: validator,
       obscureText: obscureText,
       controller: controller,

@@ -1,5 +1,6 @@
 import 'package:chat_app/core/theme/app_color.dart';
 import 'package:chat_app/core/widgets/spacing.dart';
+import 'package:chat_app/features/auth/sign_up.dart';
 import 'package:chat_app/features/widgets/custom_button.dart';
 import 'package:chat_app/features/widgets/custom_text_feild.dart';
 import 'package:chat_app/features/widgets/logo.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SignIn extends StatefulWidget {
+  static const String id = 'signIn';
   const SignIn({super.key});
 
   @override
@@ -189,8 +191,7 @@ class _SignInState extends State<SignIn> {
                     ),
 
                     InkWell(
-                      onTap: () {
-                      },
+                      onTap: () => Navigator.pushNamed(context, SignUp.id),
                       child: Text.rich(
                         TextSpan(
                           text: "Don't have an account? ",
