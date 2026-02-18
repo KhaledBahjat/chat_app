@@ -182,60 +182,37 @@ class _SignUpState extends State<SignUp> {
                       title: 'Sign Up',
                       onPressed: () async {
                         try {
-                          await FirebaseAuth.instance
-                              .createUserWithEmailAndPassword(
-                                email: emailController.text,
-                                password: passwordController.text,
-                              );
-                          AwesomeDialog(
-                            context: context,
-                            dialogType: DialogType.success,
-                            animType: AnimType.rightSlide,
-                            title: 'Success',
-                            desc: 'Your account has been created successfully.',
-                            btnOkOnPress: () {},
-                          ).show();
+                          await registerUser(context);
                         } on FirebaseAuthException catch (e) {
                           if (e.code == 'weak-password') {
-                            AwesomeDialog(
-                              context: context,
-                              dialogType: DialogType.error,
-                              animType: AnimType.rightSlide,
+                            showMessage(
+                              context,
                               title: 'weak-password',
-                              desc: 'The password provided is too weak.',
-                              btnOkOnPress: () {},
-                            ).show();
+                              message: 'The password provided is too weak.',
+                            );
                             print('The password provided is too weak.');
                           } else if (e.code == 'email-already-in-use') {
-                            AwesomeDialog(
-                              context: context,
-                              dialogType: DialogType.error,
-                              animType: AnimType.rightSlide,
+                            showMessage(
+                              context,
                               title: 'email-already-in-use',
-                              desc:
+                              message:
                                   'The account already exists for that email.',
-                              btnOkOnPress: () {},
-                            ).show();
+                            );
                             print('The account already exists for that email.');
                           } else if (e.code == 'invalid-email') {
-                            AwesomeDialog(
-                              context: context,
-                              dialogType: DialogType.error,
-                              animType: AnimType.rightSlide,
+                            showMessage(
+                              context,
                               title: 'invalid-email',
-                              desc: 'The email address is badly formatted.',
-                              btnOkOnPress: () {},
-                            ).show();
+                              message: 'The email address is badly formatted.',
+                            );
                             print('The email address is badly formatted.');
                           } else if (e.code == 'operation-not-allowed') {
-                            AwesomeDialog(
-                              context: context,
-                              dialogType: DialogType.error,
-                              animType: AnimType.rightSlide,
+                            showMessage(
+                              context,
                               title: 'operation-not-allowed',
-                              desc: 'Email/Password accounts are not enabled.',
-                              btnOkOnPress: () {},
-                            ).show();
+                              message:
+                                  'Email/Password accounts are not enabled.',
+                            );
                             print('Email/Password accounts are not enabled.');
                           }
                         } catch (e) {
@@ -277,5 +254,33 @@ class _SignUpState extends State<SignUp> {
               ),
       ),
     );
+  }
+
+  void showMessage(BuildContext context, {String? message, String? title, DialogType? type}) {
+    AwesomeDialog(
+      context: context,
+      dialogType: type ?? DialogType.error,
+      animType: AnimType.rightSlide,
+      title: title,
+      desc: message,
+      btnOkOnPress: () {},
+    ).show();
+  }
+
+  Future<void> registerUser(
+    BuildContext context,
+  ) async {
+    await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: emailController.text,
+      password: passwordController.text,
+    );
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.success,
+      animType: AnimType.rightSlide,
+      title: 'Success',
+      desc: 'Your account has been created successfully.',
+      btnOkOnPress: () {},
+    ).show();
   }
 }
