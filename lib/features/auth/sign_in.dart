@@ -2,6 +2,7 @@ import 'package:chat_app/core/helper/show_message.dart';
 import 'package:chat_app/core/theme/app_color.dart';
 import 'package:chat_app/core/widgets/spacing.dart';
 import 'package:chat_app/features/auth/sign_up.dart';
+import 'package:chat_app/features/chat/chat_page.dart';
 import 'package:chat_app/features/widgets/custom_button.dart';
 import 'package:chat_app/features/widgets/custom_text_feild.dart';
 import 'package:chat_app/features/widgets/logo.dart';
@@ -38,7 +39,7 @@ class _SignInState extends State<SignIn> {
 
     // Once signed in, return the UserCredential
     await FirebaseAuth.instance.signInWithCredential(credential);
-    Navigator.of(context).pushNamedAndRemoveUntil('home', (route) => false);
+    Navigator.of(context).pushNamedAndRemoveUntil(ChatPage.id, (route) => false);
   }
 
   @override
@@ -203,10 +204,7 @@ class _SignInState extends State<SignIn> {
                           if (user != null) {
                             await user.reload();
                             if (user.emailVerified) {
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                'home',
-                                (route) => false,
-                              );
+                            Navigator.pushReplacementNamed(context, ChatPage.id);
                             } else {
                               await user.sendEmailVerification();
                               showMessage(
@@ -264,6 +262,7 @@ class _SignInState extends State<SignIn> {
                       color: Colors.red.shade700,
                       onPressed: () async {
                         await signInWithGoogle();
+                        Navigator.pushReplacementNamed(context, ChatPage.id);
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
