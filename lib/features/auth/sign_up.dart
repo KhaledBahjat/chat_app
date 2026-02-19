@@ -178,48 +178,12 @@ class _SignUpState extends State<SignUp> {
                       height: 30.h,
                     ),
                     // sign up button
-                    CustomButton(
-                      title: 'Sign Up',
-                      onPressed: () async {
-                        try {
+                    CustomButton(title: 'Sign Up', onPressed: () async {
+                        if (formstate.currentState!.validate()) {
                           await registerUser(context);
-                        } on FirebaseAuthException catch (e) {
-                          if (e.code == 'weak-password') {
-                            showMessage(
-                              context,
-                              title: 'weak-password',
-                              message: 'The password provided is too weak.',
-                            );
-                            print('The password provided is too weak.');
-                          } else if (e.code == 'email-already-in-use') {
-                            showMessage(
-                              context,
-                              title: 'email-already-in-use',
-                              message:
-                                  'The account already exists for that email.',
-                            );
-                            print('The account already exists for that email.');
-                          } else if (e.code == 'invalid-email') {
-                            showMessage(
-                              context,
-                              title: 'invalid-email',
-                              message: 'The email address is badly formatted.',
-                            );
-                            print('The email address is badly formatted.');
-                          } else if (e.code == 'operation-not-allowed') {
-                            showMessage(
-                              context,
-                              title: 'operation-not-allowed',
-                              message:
-                                  'Email/Password accounts are not enabled.',
-                            );
-                            print('Email/Password accounts are not enabled.');
-                          }
-                        } catch (e) {
-                          print(e);
                         }
-                      },
-                    ),
+                        
+                    }),
                     SizedBox(
                       height: 20.h,
                     ),
@@ -256,7 +220,12 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
-  void showMessage(BuildContext context, {String? message, String? title, DialogType? type}) {
+  void showMessage(
+    BuildContext context, {
+    String? message,
+    String? title,
+    DialogType? type,
+  }) {
     AwesomeDialog(
       context: context,
       dialogType: type ?? DialogType.error,
@@ -267,20 +236,62 @@ class _SignUpState extends State<SignUp> {
     ).show();
   }
 
-  Future<void> registerUser(
-    BuildContext context,
-  ) async {
-    await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: emailController.text,
-      password: passwordController.text,
-    );
-    AwesomeDialog(
-      context: context,
-      dialogType: DialogType.success,
-      animType: AnimType.rightSlide,
-      title: 'Success',
-      desc: 'Your account has been created successfully.',
-      btnOkOnPress: () {},
-    ).show();
+  Future<void> registerUser(BuildContext context) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      UserCredential credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          );
+
+      User? user = credential.user;
+
+      if (user != null && !user.emailVerified) {
+        await user.sendEmailVerification();
+      }
+      showMessage(
+        context,
+        title: 'Success',
+        message:
+            'Account created successfully.\nVerification link sent to email.',
+        type: DialogType.success,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        showMessage(
+          context,
+          title: 'Weak Password',
+          message: 'The password provided is too weak.',
+        );
+      } else if (e.code == 'email-already-in-use') {
+        showMessage(
+          context,
+          title: 'Email Already Used',
+          message: 'The account already exists for that email.',
+        );
+      } else if (e.code == 'invalid-email') {
+        showMessage(
+          context,
+          title: 'Invalid Email',
+          message: 'The email address is badly formatted.',
+        );
+      } else if (e.code == 'operation-not-allowed') {
+        showMessage(
+          context,
+          title: 'Not Allowed',
+          message: 'Email/Password accounts are not enabled.',
+        );
+      }
+    } catch (e) {
+      print(e);
+    }
+
+    setState(() {
+      isLoading = false;
+    });
   }
 }
