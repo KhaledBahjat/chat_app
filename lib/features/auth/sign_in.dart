@@ -5,8 +5,10 @@ import 'package:chat_app/features/widgets/custom_button.dart';
 import 'package:chat_app/features/widgets/custom_text_feild.dart';
 import 'package:chat_app/features/widgets/logo.dart';
 import 'package:chat_app/features/widgets/show_forget_password_dialog_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class SignIn extends StatefulWidget {
   static const String id = 'signIn';
@@ -17,6 +19,26 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
+    Future signInWithGoogle() async {
+    // Trigger the authentication flow
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    await GoogleSignIn().signOut();
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+    if (googleUser == null) {
+      return;
+    }
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    await FirebaseAuth.instance.signInWithCredential(credential);
+    Navigator.of(context).pushNamedAndRemoveUntil('home', (route) => false);
+  }
   @override
   void dispose() {
     emailController.dispose();
@@ -174,8 +196,8 @@ class _SignInState extends State<SignIn> {
                       ),
                       textColor: Colors.white,
                       color: Colors.red.shade700,
-                      onPressed: () {
-                        
+                      onPressed: () async {
+                        await signInWithGoogle();
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
