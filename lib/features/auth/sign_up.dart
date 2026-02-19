@@ -1,4 +1,5 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:chat_app/core/helper/show_message.dart';
 import 'package:chat_app/core/theme/app_color.dart';
 import 'package:chat_app/core/widgets/spacing.dart';
 import 'package:chat_app/features/widgets/custom_button.dart';
@@ -144,6 +145,7 @@ class _SignUpState extends State<SignUp> {
                             style: TextStyle(
                               fontSize: 14.sp,
                               fontWeight: FontWeight.w500,
+                              color: Colors.white,
                             ),
                           ),
                           HeightSpace(10),
@@ -220,21 +222,7 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
-  void showMessage(
-    BuildContext context, {
-    String? message,
-    String? title,
-    DialogType? type,
-  }) {
-    AwesomeDialog(
-      context: context,
-      dialogType: type ?? DialogType.error,
-      animType: AnimType.rightSlide,
-      title: title,
-      desc: message,
-      btnOkOnPress: () {},
-    ).show();
-  }
+
 
   Future<void> registerUser(BuildContext context) async {
     setState(() {

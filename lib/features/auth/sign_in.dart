@@ -1,3 +1,4 @@
+import 'package:chat_app/core/helper/show_message.dart';
 import 'package:chat_app/core/theme/app_color.dart';
 import 'package:chat_app/core/widgets/spacing.dart';
 import 'package:chat_app/features/auth/sign_up.dart';
@@ -19,7 +20,7 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
-    Future signInWithGoogle() async {
+  Future signInWithGoogle() async {
     // Trigger the authentication flow
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
     await GoogleSignIn().signOut();
@@ -39,6 +40,7 @@ class _SignInState extends State<SignIn> {
     await FirebaseAuth.instance.signInWithCredential(credential);
     Navigator.of(context).pushNamedAndRemoveUntil('home', (route) => false);
   }
+
   @override
   void dispose() {
     emailController.dispose();
@@ -178,13 +180,77 @@ class _SignInState extends State<SignIn> {
                         ],
                       ),
                     ),
+
                     // login button
                     CustomButton(
                       title: 'Login with Email',
                       onPressed: () async {
-                      
+                        if (!formstate.currentState!.validate()) return;
+
+                        setState(() {
+                          isLoading = true;
+                        });
+
+                        try {
+                          await FirebaseAuth.instance
+                              .signInWithEmailAndPassword(
+                                email: emailController.text.trim(),
+                                password: passwordController.text.trim(),
+                              );
+
+                          User? user = FirebaseAuth.instance.currentUser;
+
+                          if (user != null) {
+                            await user.reload();
+                            if (user.emailVerified) {
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                'home',
+                                (route) => false,
+                              );
+                            } else {
+                              await user.sendEmailVerification();
+                              showMessage(
+                                context,
+                                title: 'Email not verified',
+                                message:
+                                    'A verification link has been sent to your email. Please check your inbox and verify your email before logging in.',
+                              );
+                            }
+                          }
+                        } on FirebaseAuthException catch (e) {
+                          if (e.code == 'user-not-found') {
+                            showMessage(
+                              context,
+                              title: 'User Not Found',
+                              message: 'No user found for that email.',
+                            );
+                          } else if (e.code == 'wrong-password') {
+                            showMessage(
+                              context,
+                              title: 'Wrong Password',
+                              message: 'The password provided is incorrect.',
+                            );
+                          } else {
+                            showMessage(
+                              context,
+                              title: 'Error',
+                              message: e.message,
+                            );
+                          }
+                        } catch (e) {
+                          showMessage(
+                            context,
+                            title: 'Error',
+                            message: e.toString(),
+                          );
+                        } finally {
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }
                       },
                     ),
+
                     SizedBox(
                       height: 20.h,
                     ),
@@ -242,3 +308,5 @@ class _SignInState extends State<SignIn> {
     );
   }
 }
+
+
