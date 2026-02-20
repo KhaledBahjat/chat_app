@@ -15,13 +15,14 @@ class ChatPage extends StatelessWidget {
   ChatPage({super.key});
 
   static const String id = 'chatPage';
+  final _controller = ScrollController();
   CollectionReference messages = FirebaseFirestore.instance.collection(
     kMessagesCollection,
   );
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<QuerySnapshot>(
-      future: messages.get(),
+    return StreamBuilder<QuerySnapshot>(
+      stream: messages.orderBy('createdAt', descending: false).snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           List<MessageModel> listMessages = [];
@@ -55,6 +56,7 @@ class ChatPage extends StatelessWidget {
                 children: [
                   Expanded(
                     child: ListView.builder(
+                      controller: _controller,
                       itemBuilder: (context, index) {
                         return ChatBubble(
                           message: listMessages[index].message,
@@ -78,6 +80,11 @@ class ChatPage extends StatelessWidget {
                         'createdAt': FieldValue.serverTimestamp(),
                         'senderId': FirebaseAuth.instance.currentUser!.email,
                       });
+                      _controller.animateTo(
+                        duration: Duration(milliseconds: 100),
+                        curve: Curves.easeInOut,
+                        _controller.position.maxScrollExtent,
+                      );
                     },
                   ),
                 ],
