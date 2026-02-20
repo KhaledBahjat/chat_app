@@ -22,7 +22,7 @@ class ChatPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: messages.orderBy('createdAt', descending: false).snapshots(),
+      stream: messages.orderBy('createdAt', descending: true).snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           List<MessageModel> listMessages = [];
@@ -56,6 +56,7 @@ class ChatPage extends StatelessWidget {
                 children: [
                   Expanded(
                     child: ListView.builder(
+                      reverse: true,
                       controller: _controller,
                       itemBuilder: (context, index) {
                         return ChatBubble(
@@ -81,9 +82,9 @@ class ChatPage extends StatelessWidget {
                         'senderId': FirebaseAuth.instance.currentUser!.email,
                       });
                       _controller.animateTo(
-                        duration: Duration(milliseconds: 100),
+                        duration: Duration(milliseconds: 300),
                         curve: Curves.easeInOut,
-                        _controller.position.maxScrollExtent,
+                        _controller.position.minScrollExtent,
                       );
                     },
                   ),
