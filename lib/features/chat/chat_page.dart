@@ -3,10 +3,13 @@ import 'dart:developer';
 import 'package:chat_app/core/helper/constant.dart';
 import 'package:chat_app/features/chat/widget/bouble_chat.dart';
 import 'package:chat_app/features/chat/widget/coustom_drawer.dart';
+import 'package:chat_app/features/chat/widget/loading_widget.dart';
+import 'package:chat_app/models/message_model.dart';
 import 'package:chat_bubbles/message_bars/message_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ChatPage extends StatelessWidget {
   ChatPage({super.key});
@@ -21,7 +24,10 @@ class ChatPage extends StatelessWidget {
       future: messages.get(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          log(snapshot.data!.docs[0]['message']);
+          List<MessageModel> listMessages = [];
+          for (int i = 0; i < snapshot.data!.docs.length; i++) {
+            listMessages.add(MessageModel.fromJson(snapshot.data!.docs[i]));
+          }
           return GestureDetector(
             onTap: () => FocusScope.of(context).unfocus(),
             child: Scaffold(
@@ -48,38 +54,23 @@ class ChatPage extends StatelessWidget {
               body: Column(
                 children: [
                   Expanded(
-                    child: ListView(
+                    child: ListView.builder(
+                      itemBuilder: (context, index) {
+                        return ChatBubble(
+                          message: listMessages[index].message,
+                          sender:
+                              listMessages[index].senderId ==
+                              FirebaseAuth.instance.currentUser!.email,
+                          time: DateFormat('hh:mm a').format(
+                            listMessages[index].createdAt.toDate(),
+                          ),
+                        );
+                      },
                       shrinkWrap: true,
-                      children: const [
-                        ChatBubble(
-                          message: "السلام عليكم",
-                          sender: false,
-                          time: "10:30 AM",
-                        ),
-                        ChatBubble(
-                          message: "وعليكم السلام يا بطل 🔥",
-                          sender: true,
-                          time: "10:31 AM",
-                        ),
-                        ChatBubble(
-                          message: "كيف حالك؟",
-                          sender: false,
-                          time: "10:32 AM",
-                        ),
-                        ChatBubble(
-                          message:
-                              "أنا بخير، شكراً لسؤالك! كيف يمكنني مساعدتك اليوم؟",
-                          sender: true,
-                          time: "10:33 AM",
-                        ),
-                        ChatBubble(
-                          message: "مع السلامة",
-                          sender: false,
-                          time: "10:34 AM",
-                        ),
-                      ],
+                      itemCount: listMessages.length,
                     ),
                   ),
+
                   MessageBar(
                     onSend: (value) {
                       messages.add({
@@ -94,7 +85,7 @@ class ChatPage extends StatelessWidget {
             ),
           );
         } else {
-          return const Center(child: CircularProgressIndicator());
+          return const LoadingWidget();
         }
       },
     );
