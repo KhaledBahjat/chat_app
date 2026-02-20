@@ -1,4 +1,5 @@
-
+import 'package:chat_app/core/widgets/spacing.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -82,7 +83,42 @@ void showForgotPasswordDialog(BuildContext context) {
                     ),
                   ),
                   onPressed: () async {
-                  
+                    final email = emailController.text.trim();
+                    if (email.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Please enter your email')),
+                      );
+                      return;
+                    }
+
+                    try {
+                      await FirebaseAuth.instance.sendPasswordResetEmail(
+                        email: email,
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Password reset link has been sent to $email',
+                          ),
+                        ),
+                      );
+                      Navigator.pop(context); 
+                    } on FirebaseAuthException catch (e) {
+                      String message = 'An error occurred';
+                      if (e.code == 'user-not-found') {
+                        message = 'No user found for this email';
+                      } else if (e.code == 'invalid-email') {
+                        message = 'The email address is not valid';
+                      }
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(message)),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Something went wrong')),
+                      );
+                    }
                   },
                   child: Text(
                     'Send Reset Link',
@@ -91,7 +127,7 @@ void showForgotPasswordDialog(BuildContext context) {
                 ),
               ),
 
-              const SizedBox(height: 10),
+              HeightSpace(20),
 
               TextButton(
                 onPressed: () => Navigator.pop(context),
