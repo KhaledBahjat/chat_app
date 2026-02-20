@@ -1,20 +1,18 @@
-import 'package:chat_app/core/widgets/spacing.dart';
+import 'package:chat_app/core/helper/constant.dart';
 import 'package:chat_app/features/auth/sign_in.dart';
 import 'package:chat_app/features/chat/widget/bouble_chat.dart';
 import 'package:chat_bubbles/message_bars/message_bar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class ChatPage extends StatefulWidget {
-  const ChatPage({super.key});
+class ChatPage extends StatelessWidget {
+  ChatPage({super.key});
 
   static const String id = 'chatPage';
-
-  @override
-  State<ChatPage> createState() => _ChatPageState();
-}
-
-class _ChatPageState extends State<ChatPage> {
+  CollectionReference messages = FirebaseFirestore.instance.collection(
+    kMessagesCollection,
+  );
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -70,7 +68,8 @@ class _ChatPageState extends State<ChatPage> {
                     time: "10:32 AM",
                   ),
                   ChatBubble(
-                    message: "أنا بخير، شكراً لسؤالك! كيف يمكنني مساعدتك اليوم؟",
+                    message:
+                        "أنا بخير، شكراً لسؤالك! كيف يمكنني مساعدتك اليوم؟",
                     sender: true,
                     time: "10:33 AM",
                   ),
@@ -82,37 +81,19 @@ class _ChatPageState extends State<ChatPage> {
                 ],
               ),
             ),
-            messageBar(),
+            MessageBar(
+              onSend: (value) {
+                messages.add({
+                  'message': value,
+                  'createdAt': FieldValue.serverTimestamp(),
+                  'senderId': FirebaseAuth.instance.currentUser!.email,
+                });
+              },
+              
+            ),
           ],
         ),
       ),
     );
-  }
-
-  MessageBar messageBar() {
-    return MessageBar(
-            onSend: (valu) {},
-            actions: [
-              InkWell(
-                child: Icon(
-                  Icons.add,
-                  color: Colors.black,
-                  size: 24,
-                ),
-                onTap: () {},
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: 8, right: 8),
-                child: InkWell(
-                  child: Icon(
-                    Icons.camera_alt,
-                    color: Colors.green,
-                    size: 24,
-                  ),
-                  onTap: () {},
-                ),
-              ),
-            ],
-          );
   }
 }

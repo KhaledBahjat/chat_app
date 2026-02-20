@@ -20,7 +20,7 @@ class Chatna extends StatelessWidget {
   const Chatna({
     super.key,
   });
-
+  
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
