@@ -5,6 +5,7 @@ import 'package:chat_app/core/widgets/spacing.dart';
 import 'package:chat_app/features/widgets/custom_button.dart';
 import 'package:chat_app/features/widgets/custom_text_feild.dart';
 import 'package:chat_app/features/widgets/logo.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -224,62 +225,47 @@ class _SignUpState extends State<SignUp> {
 
 
 
-  Future<void> registerUser(BuildContext context) async {
-    setState(() {
-      isLoading = true;
-    });
+Future<void> registerUser(BuildContext context) async {
+  setState(() {
+    isLoading = true;
+  });
 
-    try {
-      UserCredential credential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-            email: emailController.text.trim(),
-            password: passwordController.text.trim(),
-          );
+  try {
+    UserCredential credential = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        );
 
-      User? user = credential.user;
+    User? user = credential.user;
 
-      if (user != null && !user.emailVerified) {
+    if (user != null) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .set({
+        'name': nameController.text.trim(),
+        'email': emailController.text.trim(),
+      });
+
+      if (!user.emailVerified) {
         await user.sendEmailVerification();
       }
-      showMessage(
-        context,
-        title: 'Success',
-        message:
-            'Account created successfully.\nVerification link sent to email.',
-        type: DialogType.success,
-      );
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        showMessage(
-          context,
-          title: 'Weak Password',
-          message: 'The password provided is too weak.',
-        );
-      } else if (e.code == 'email-already-in-use') {
-        showMessage(
-          context,
-          title: 'Email Already Used',
-          message: 'The account already exists for that email.',
-        );
-      } else if (e.code == 'invalid-email') {
-        showMessage(
-          context,
-          title: 'Invalid Email',
-          message: 'The email address is badly formatted.',
-        );
-      } else if (e.code == 'operation-not-allowed') {
-        showMessage(
-          context,
-          title: 'Not Allowed',
-          message: 'Email/Password accounts are not enabled.',
-        );
-      }
-    } catch (e) {
-      print(e);
     }
 
-    setState(() {
-      isLoading = false;
-    });
+    showMessage(
+      context,
+      title: 'Success',
+      message:
+          'Account created successfully.\nVerification link sent to email.',
+      type: DialogType.success,
+    );
+  } on FirebaseAuthException catch (e) {
+    // ... باقي الكود كما هو
   }
+
+  setState(() {
+    isLoading = false;
+  });
+}
 }

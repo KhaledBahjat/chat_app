@@ -4,8 +4,10 @@ class MessageModel {
   final String message;
   final String senderId;
   final Timestamp createdAt;
+  final String? senderName;
 
   MessageModel({
+    this.senderName,
     required this.message,
     required this.senderId,
     required this.createdAt,
@@ -16,6 +18,7 @@ class MessageModel {
       message: messageMap['message'] ?? '',
       senderId: messageMap['senderId'] ?? false,
       createdAt: messageMap['createdAt'] ?? Timestamp.now(),
+      senderName: messageMap['senderName'],
     );
   }
 }

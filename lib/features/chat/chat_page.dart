@@ -64,6 +64,7 @@ class ChatPage extends StatelessWidget {
                           sender:
                               listMessages[index].senderId ==
                               FirebaseAuth.instance.currentUser!.email,
+                          senderName: listMessages[index].senderName,
                           time: DateFormat('hh:mm a').format(
                             listMessages[index].createdAt.toDate(),
                           ),
@@ -75,16 +76,24 @@ class ChatPage extends StatelessWidget {
                   ),
 
                   MessageBar(
-                    onSend: (value) {
+                    onSend: (value) async {
+                      final userDoc = await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(FirebaseAuth.instance.currentUser!.uid)
+                          .get();
+
+                      final userName = userDoc.data()?['name'] ?? 'Unknown';
                       messages.add({
                         'message': value,
                         'createdAt': FieldValue.serverTimestamp(),
                         'senderId': FirebaseAuth.instance.currentUser!.email,
+                        'senderName': userName,
                       });
+
                       _controller.animateTo(
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        _controller.position.minScrollExtent,
+                        _controller.position.maxScrollExtent,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.fastOutSlowIn,
                       );
                     },
                   ),

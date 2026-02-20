@@ -7,6 +7,7 @@ import 'package:chat_app/features/widgets/custom_button.dart';
 import 'package:chat_app/features/widgets/custom_text_feild.dart';
 import 'package:chat_app/features/widgets/logo.dart';
 import 'package:chat_app/features/widgets/show_forget_password_dialog_widget.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,26 +22,44 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
-  Future signInWithGoogle() async {
-    // Trigger the authentication flow
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-    await GoogleSignIn().signOut();
-    // Obtain the auth details from the request
-    final GoogleSignInAuthentication? googleAuth =
-        await googleUser?.authentication;
-    if (googleUser == null) {
-      return;
-    }
-    // Create a new credential
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
-    );
+Future signInWithGoogle() async {
+  // Trigger the authentication flow
+  final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+  await GoogleSignIn().signOut();
 
-    // Once signed in, return the UserCredential
-    await FirebaseAuth.instance.signInWithCredential(credential);
-    Navigator.of(context).pushNamedAndRemoveUntil(ChatPage.id, (route) => false);
+  if (googleUser == null) return; // المستخدم لغى العملية
+
+  // Obtain the auth details from the request
+  final GoogleSignInAuthentication? googleAuth =
+      await googleUser.authentication;
+
+  // Create a new credential
+  final credential = GoogleAuthProvider.credential(
+    accessToken: googleAuth?.accessToken,
+    idToken: googleAuth?.idToken,
+  );
+
+  // Sign in
+  final userCredential =
+      await FirebaseAuth.instance.signInWithCredential(credential);
+  final user = userCredential.user;
+
+  if (user != null) {
+    final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
+    final docSnapshot = await userDoc.get();
+
+    if (!docSnapshot.exists) {
+      await userDoc.set({
+        'name': user.displayName ?? 'Unknown',
+        'email': user.email ?? '',
+      });
+    }
   }
+
+  // انتقل لصفحة الدردشة
+  Navigator.of(context)
+      .pushNamedAndRemoveUntil(ChatPage.id, (route) => false);
+}
 
   @override
   void dispose() {
